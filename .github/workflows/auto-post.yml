@@ -21,9 +21,9 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Generate article with Gemini
+      - name: Generate article with AI
         env:
-          GEMINI_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: python generate.py
 
       - name: Commit and push
