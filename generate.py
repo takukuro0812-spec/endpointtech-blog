@@ -31,7 +31,7 @@ headers = {
 }
 
 payload = {
-    "model": "google/gemini-flash-1.5",  # 無料で使える高速モデル
+    "model": "google/gemini-flash-1.5",
     "messages": [
         {"role": "user", "content": prompt}
     ]
@@ -39,6 +39,11 @@ payload = {
 
 response = requests.post(url, headers=headers, json=payload)
 data = response.json()
+
+# ★ エラー内容を必ず表示する
+if "choices" not in data:
+    print("OpenRouter API のレスポンス:", data)
+    raise SystemExit("OpenRouter がエラーを返しました")
 
 content = data["choices"][0]["message"]["content"]
 
