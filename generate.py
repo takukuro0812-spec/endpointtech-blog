@@ -43,4 +43,15 @@ data = response.json()
 
 # 新しいレスポンス形式に対応
 try:
-    content = data["
+    content = data["candidates"][0]["content"]["parts"][0]["text"]
+except Exception as e:
+    print("Gemini API のレスポンス:", data)
+    raise e
+
+filename = f"_posts/{today}-intune-basic.md"
+
+with open(filename, "w", encoding="utf-8") as f:
+    f.write(f"---\ntitle: \"{title}\"\ndate: {today}\ncategories: [Intune]\n---\n\n")
+    f.write(content)
+
+print("記事生成完了:", filename)
