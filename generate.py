@@ -1,36 +1,40 @@
-name: Auto Generate Blog Post
+import requests
+import datetime
+import os
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "0 3 * * *"   # 毎日3時に自動実行
+API_KEY = os.getenv("GEMINI_API_KEY")
 
-jobs:
-  generate:
-    runs-on: ubuntu-latest
+today = datetime.date.today().strftime("%Y-%m-%d")
+title = "Intuneの基本をわかりやすく解説"
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+prompt = f"""
+あなたはエンドポイント管理の専門家です。
+以下のテーマで初心者向けのブログ記事を書いてください。
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+タイトル: {title}
 
-      - name: Install dependencies
-        run: pip install requests
+構成:
+- 導入
+- 基本概念
+- メリット
+- 具体例
+- まとめ
 
-      - name: Generate article with Gemini
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python generate.py
+Markdown形式で出力してください。
+"""
 
-      - name: Commit and push
-        run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
-          git add .
-          git commit -m "Auto-generated article" || echo "No changes"
-          git push
+url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}"
 
+response = requests.post(url, json={
+    "contents": [{"parts": [{"text": prompt}]}]
+})
+
+content = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+
+filename = f"_posts/{today}-intune-basic.md"
+
+with open(filename, "w", encoding="utf-8") as f:
+    f.write(f"---\ntitle: \"{title}\"\ndate: {today}\ncategories: [Intune]\n---\n\n")
+    f.write(content)
+
+print("記事生成完了:", filename)
