@@ -26,7 +26,8 @@ Markdown形式で出力してください。
 # ★ 最新の無料モデル（2026年時点）
 MODEL = "gemini-1.5-flash"
 
-url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={API_KEY}"
+# ★ v1beta → v1 に変更（これが重要）
+url = f"https://generativelanguage.googleapis.com/v1/models/{MODEL}:generateContent?key={API_KEY}"
 
 payload = {
     "contents": [
