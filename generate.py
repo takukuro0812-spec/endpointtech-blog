@@ -25,11 +25,26 @@ Markdown形式で出力してください。
 
 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}"
 
-response = requests.post(url, json={
-    "contents": [{"parts": [{"text": prompt}]}]
-})
+payload = {
+    "contents": [
+        {
+            "parts": [
+                {"text": prompt}
+            ]
+        }
+    ]
+}
 
-content = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+response = requests.post(url, json=payload)
+
+data = response.json()
+
+# 新しいレスポンス形式に対応
+try:
+    content = data["candidates"][0]["content"]["parts"][0]["text"]
+except Exception as e:
+    print("Gemini API のレスポンス:", data)
+    raise e
 
 filename = f"_posts/{today}-intune-basic.md"
 
