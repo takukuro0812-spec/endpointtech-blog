@@ -2,7 +2,7 @@ import requests
 import datetime
 import os
 
-API_KEY = os.getenv("GEMINI_API_KEY")
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 today = datetime.date.today().strftime("%Y-%m-%d")
 title = "Intuneの基本をわかりやすく解説"
@@ -23,31 +23,24 @@ prompt = f"""
 Markdown形式で出力してください。
 """
 
-# ★ 最新の無料モデル（2026年時点）
-MODEL = "gemini-1.5-flash"
+url = "https://openrouter.ai/api/v1/chat/completions"
 
-# ★ v1beta → v1 に変更（これが重要）
-url = f"https://generativelanguage.googleapis.com/v1/models/{MODEL}:generateContent?key={API_KEY}"
+headers = {
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json"
+}
 
 payload = {
-    "contents": [
-        {
-            "parts": [
-                {"text": prompt}
-            ]
-        }
+    "model": "google/gemini-flash-1.5",  # 無料で使える高速モデル
+    "messages": [
+        {"role": "user", "content": prompt}
     ]
 }
 
-response = requests.post(url, json=payload)
+response = requests.post(url, headers=headers, json=payload)
 data = response.json()
 
-# 新しいレスポンス形式に対応
-try:
-    content = data["candidates"][0]["content"]["parts"][0]["text"]
-except Exception as e:
-    print("Gemini API のレスポンス:", data)
-    raise e
+content = data["choices"][0]["message"]["content"]
 
 filename = f"_posts/{today}-intune-basic.md"
 
